@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum-Safe Blockchain Guardrail - Control Center</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #9B59B6;
+            --bg-secondary: #7D3C98;
+            --bg-tertiary: #6B2E80;
+            --accent-blue: #39FF14;
+            --accent-purple: #FF6600;
+            --accent-cyan: #39FF14;
+            --text-primary: #FFFFFF;
+            --text-secondary: #E0E0E0;
+            --border-color: rgba(255, 102, 0, 0.5);
+            --glass-bg: #FAFAFA;
+            --glass-border: rgba(255, 102, 0, 0.4);
+        }
+
+        html,
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #9B59B6;
+            color: var(--text-primary);
+            height: 100%;
+            min-height: 100vh;
+        }
+
+        body {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: none;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            color: #9B59B6;
+            white-space: nowrap;
+            animation: float-drift 4s ease-in-out infinite;
+        }
+
+        .logo span {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #39FF14, #FF6600);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(255, 102, 0, 0.4);
+            animation: subtle-glow 3s ease-in-out infinite;
+        }
+
+        .nav-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .nav-section-title {
+            display: none;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 13px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #39FF14;
+            border-bottom: 2px solid #39FF14;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: #39FF14;
+            font-weight: 700;
+            border-bottom: 3px solid #39FF14;
+        }
+
+        .nav-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        /* Top Navbar */
+        .topbar {
+            grid-column: 1;
+            grid-row: 1;
+            background: #FAFAFA;
+            backdrop-filter: blur(10px);
+            border-bottom: 3px solid #39FF14;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+            gap: 32px;
+            box-shadow: 0 8px 24px rgba(155, 89, 182, 0.2);
+            position: relative;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topbar-title {
+            display: none;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            padding: 10px 16px;
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.2), rgba(57, 255, 20, 0.08));
+            border: 2px solid #39FF14;
+            border-radius: 20px;
+            color: #39FF14;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(57, 255, 20, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .status-indicator:hover {
+            box-shadow: 0 8px 20px rgba(57, 255, 20, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #39FF14, #FF6600);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: 800;
+            color: #1a1a1a;
+            box-shadow: 0 8px 24px rgba(57, 255, 20, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) translateY(-3px);
+            box-shadow: 0 12px 32px rgba(57, 255, 20, 0.5);
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-column: 1;
+            grid-row: 2;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        /* Cards & Panels */
+        .card {
+            background: #7D3C98;
+            backdrop-filter: blur(20px);
+            border: 2px solid #39FF14;
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -40%;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(57, 255, 20, 0.1), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: subtle-glow 5s ease-in-out infinite;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -20%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 102, 0, 0.1), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: subtle-glow 6s ease-in-out infinite reverse;
+        }
+
+        .card:hover {
+            border-color: #39FF14;
+            box-shadow: 0 16px 48px rgba(57, 255, 20, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            transform: translateY(-4px);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #FFFFFF;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Grid Layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1400px) {
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .nav-item span:not(.nav-icon) {
+                display: none;
+            }
+
+            .topbar-left {
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .topbar {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 12px 16px;
+                gap: 12px;
+            }
+
+            .topbar-left {
+                flex-basis: 100%;
+                gap: 8px;
+            }
+
+            .topbar-right {
+                flex-basis: 100%;
+                justify-content: space-between;
+            }
+
+            .logo span {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+
+            .logo {
+                font-size: 14px;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-item span:not(.nav-icon) {
+                display: none;
+            }
+        }
+
+        /* Stat Card */
+        .stat-card {
+            background: #7D3C98;
+            border: 2px solid #39FF14;
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 255, 65, 0.25), transparent);
+            border-radius: 50%;
+            transition: all 0.6s ease;
+            animation: float-bubble 4s ease-in-out infinite;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -30%;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 51, 0, 0.15), transparent);
+            border-radius: 50%;
+            animation: float-bubble 5s ease-in-out infinite reverse;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: #39FF14;
+            box-shadow: 0 16px 48px rgba(57, 255, 20, 0.4);
+        }
+
+        .stat-card:hover::before {
+            top: -20%;
+            right: -20%;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #B0B0B0;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(90deg, #39FF14, #FFE000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: #10b981;
+            position: relative;
+            z-index: 2;
+            font-weight: 600;
+        }
+
+        /* Button */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #39FF14, #2ED93C);
+            color: #000000;
+            border: 2px solid transparent;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(57, 255, 20, 0.5);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 14px 36px rgba(57, 255, 20, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(57, 255, 20, 0.15);
+            color: #39FF14;
+            border: 2px solid #39FF14;
+            font-weight: 600;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(57, 255, 20, 0.25);
+            border-color: #39FF14;
+            box-shadow: 0 8px 20px rgba(57, 255, 20, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: rgba(255, 0, 0, 0.2);
+            color: #FF0000;
+            border: 2px solid #FF0000;
+            font-weight: 600;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 0, 0, 0.3);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 2px solid rgba(57, 255, 20, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+            background: #6B2E80;
+        }
+
+        .transaction-item:hover {
+            background: rgba(57, 255, 20, 0.15);
+            padding-left: 24px;
+            border-left: 3px solid #39FF14;
+            border-bottom: 2px solid #39FF14;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .tx-info {
+            flex: 1;
+        }
+
+        .tx-hash {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #39FF14;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .tx-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #10b981;
+            margin-bottom: 4px;
+        }
+
+        .tx-time {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .tx-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-safe {
+            background: rgba(57, 255, 20, 0.2);
+            color: #39FF14;
+            border: 2px solid #39FF14;
+            font-weight: 700;
+        }
+
+        .badge-risk {
+            background: rgba(255, 102, 0, 0.2);
+            color: #FF6600;
+            border: 2px solid #FF6600;
+            font-weight: 700;
+        }
+
+        /* Result Panel */
+        .result-panel {
+            background: #6B2E80;
+            border: 2px solid #39FF14;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            color: #E0E0E0;
+            animation: slideInUp 0.5s ease-out;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-panel.success {
+            border-color: #39FF14;
+            color: #39FF14;
+        }
+
+        .result-panel.error {
+            border-color: #FF0000;
+            color: #FF0000;
+        }
+
+        .result-panel.loading {
+            border-color: #39FF14;
+            color: #39FF14;
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { border-color: #39FF14; box-shadow: 0 0 10px rgba(57, 255, 20, 0.6); }
+            50% { border-color: #FF6600; box-shadow: 0 0 20px rgba(255, 102, 0, 0.6); }
+        }
+
+        @keyframes float-bubble {
+            0%, 100% { transform: translateY(0px) scale(1); opacity: 0.6; }
+            50% { transform: translateY(-20px) scale(1.1); opacity: 0.9; }
+        }
+
+        @keyframes subtle-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(57, 255, 20, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(255, 102, 0, 0.5); }
+        }
+
+        @keyframes float-drift {
+            0%, 100% { transform: translateY(0px); }
+            25% { transform: translateY(-5px); }
+            50% { transform: translateY(-10px); }
+            75% { transform: translateY(-5px); }
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #39FF14, #FFE000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #39FF14;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #39FF14;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 28px;
+            color: #FFFFFF;
+            background: linear-gradient(90deg, #39FF14, #FFE000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            animation: slideInUp 0.4s ease-out;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Navbar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="logo">
+                <span>🔐</span>
+                <div>Quantum Shield</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-item active" onclick="switchTab('overview')">
+                    <span class="nav-icon">📊</span>
+                    <span>Overview</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('transactions')">
+                    <span class="nav-icon">🔄</span>
+                    <span>Transactions</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('security')">
+                    <span class="nav-icon">🛡️</span>
+                    <span>Security</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-item" onclick="switchTab('monitoring')">
+                    <span class="nav-icon">👁️</span>
+                    <span>Monitoring</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('architecture')">
+                    <span class="nav-icon">🏛️</span>
+                    <span>Architecture</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-item" onclick="switchTab('settings')">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <div class="status-indicator" id="statusIndicator">
+                <span class="status-dot"></span>
+                <span>Initializing...</span>
+            </div>
+            <div class="avatar">Q</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Overview Tab -->
+        <div id="overview-tab" class="tab-content">
+            <div class="section-title">Real-Time Dashboard</div>
+
+            <!-- Stats Grid -->
+            <div class="grid-4">
+                <div class="stat-card">
+                    <div class="stat-label">Total Transactions</div>
+                    <div class="stat-value" id="totalTx">0</div>
+                    <div class="stat-change">↑ Real-time processing</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Quantum-Safe</div>
+                    <div class="stat-value" id="quantumSafe">0</div>
+                    <div class="stat-change">↑ Post-quantum ready</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Anomalies Detected</div>
+                    <div class="stat-value" id="anomalies">0</div>
+                    <div class="stat-change">↑ AI monitored</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">System Uptime</div>
+                    <div class="stat-value" id="uptime" style="font-size: 18px;">0s</div>
+                    <div class="stat-change">↑ Always running</div>
+                </div>
+            </div>
+
+            <!-- Control Center -->
+            <div class="card" style="margin-top: 32px;">
+                <h3 class="card-title">Control Center</h3>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="simulateRealTransaction()">
+                        ⚡ Simulate Transaction
+                    </button>
+                    <button class="btn btn-secondary" onclick="processCustomTransaction()">
+                        🔄 Custom Transaction
+                    </button>
+                    <button class="btn btn-secondary" onclick="startBlockchainMonitoring()">
+                        👁️ Start Monitoring
+                    </button>
+                    <button class="btn btn-secondary" onclick="stopBlockchainMonitoring()">
+                        🛑 Stop Monitoring
+                    </button>
+                    <button class="btn btn-secondary" onclick="startAutoProcessing()">
+                        🤖 Auto Process
+                    </button>
+                    <button class="btn btn-danger" onclick="resetSystem()">
+                        🔄 Reset System
+                    </button>
+                </div>
+                <div id="processingResults"></div>
+            </div>
+        </div>
+
+        <!-- Transactions Tab -->
+        <div id="transactions-tab" class="tab-content" style="display: none;">
+            <div class="section-title">Live Transaction Feed</div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3 class="card-title">Recent Transactions</h3>
+                    <div id="transactionList" style="max-height: 500px; overflow-y: auto;">
+                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            No transactions yet. Start by simulating a transaction.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Transaction Details</h3>
+                    <div id="transactionDetails"
+                        style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                        Select a transaction to view details
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Tab -->
+        <div id="security-tab" class="tab-content" style="display: none;">
+            <div class="section-title">Security & Anomaly Detection</div>
+            <div class="card">
+                <p>Real-time anomaly detection and quantum-safe cryptography monitoring</p>
+                <div id="securityPanel" style="margin-top: 20px; color: var(--text-secondary);">
+                    Status: Monitoring active...
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitoring Tab -->
+        <div id="monitoring-tab" class="tab-content" style="display: none;">
+            <div class="section-title">Blockchain Monitoring</div>
+            <div class="card">
+                <div id="blockchainStatus" style="padding: 20px;">
+                    <span id="blockchainStatusText">Not Active</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture Tab -->
+        <div id="architecture-tab" class="tab-content" style="display: none;">
+            <div class="section-title">System Architecture</div>
+            <div class="grid-2">
+                <div class="card">
+                    <h3 class="card-title">Transaction Interceptor</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6;">
+                        Real-time transaction capture with JSON-RPC & WebSocket integration. Live monitoring of Ethereum
+                        network transactions.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">PQC Signature Engine</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6;">
+                        Post-quantum cryptography using Dilithium & Falcon algorithms. Quantum-safe signature generation
+                        and key management.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Anomaly Detector</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6;">
+                        ML-based pattern analysis with risk assessment & scoring. Real-time alert system for suspicious
+                        activities.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Control Center</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6;">
+                        Live monitoring interface with real-time statistics. Dashboard control & management for all
+                        system components.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings-tab" class="tab-content" style="display: none;">
+            <div class="section-title">Settings</div>
+            <div class="card">
+                <h3 class="card-title">System Configuration</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Configure your blockchain monitoring and
+                    security parameters.</p>
+                <button class="btn btn-secondary">Advanced Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let autoProcessingInterval = null;
+        let isConnected = false;
+        let isBlockchainMonitoring = false;
+        let stats = {
+            totalTransactions: 0,
+            quantumSafeUpgrades: 0,
+            anomaliesDetected: 0,
+            startTime: Date.now()
+        };
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.getElementById(tabName + '-tab').style.display = 'block';
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+        }
+
+        function updateStatus(status) {
+            const indicator = document.getElementById('statusIndicator');
+            if (status === 'connected') {
+                indicator.innerHTML = '<span class="status-dot"></span><span>System: Connected</span>';
+                indicator.style.background = 'rgba(16, 185, 129, 0.1)';
+                indicator.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                indicator.style.color = '#10b981';
+            } else {
+                indicator.innerHTML = '<span class="status-dot" style="background: #ef4444;"></span><span>System: Disconnected</span>';
+                indicator.style.background = 'rgba(239, 68, 68, 0.1)';
+                indicator.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                indicator.style.color = '#ef4444';
+            }
+        }
+
+        function showResult(message, type) {
+            const container = document.getElementById('processingResults');
+            const panelClass = type === 'result-loading' ? 'loading' : (type === 'result-success' ? 'success' : 'error');
+            container.innerHTML = `<div class="result-panel ${panelClass}">${message}</div>`;
+        }
+
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                isConnected = true;
+                updateStatus('connected');
+                isBlockchainMonitoring = data.services.blockchain_interceptor;
+                return true;
+            } catch (error) {
+                isConnected = false;
+                updateStatus('disconnected');
+                return false;
+            }
+        }
+
+        async function loadStats() {
+            if (!isConnected) return;
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const data = await response.json();
+                stats = {
+                    totalTransactions: data.total_processed || 0,
+                    quantumSafeUpgrades: data.quantum_safe_upgrades || 0,
+                    anomaliesDetected: data.anomalies_detected || 0,
+                    startTime: data.start_time ? data.start_time * 1000 : Date.now()
+                };
+                document.getElementById('totalTx').textContent = stats.totalTransactions;
+                document.getElementById('quantumSafe').textContent = stats.quantumSafeUpgrades;
+                document.getElementById('anomalies').textContent = stats.anomaliesDetected;
+                document.getElementById('uptime').textContent = Math.round((Date.now() - stats.startTime) / 1000) + 's';
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        async function simulateRealTransaction() {
+            if (!isConnected) {
+                showResult('Backend not connected. Please start the backend first.', 'result-error');
+                return;
+            }
+            showResult('Processing transaction through quantum-safe system...', 'result-loading');
+            try {
+                const response = await fetch(`${API_BASE}/simulate-transaction`, { method: 'POST', headers: { 'Content-Type': 'application/json', } });
+                const data = await response.json();
+                if (data.success) {
+                    showResult(`TRANSACTION PROCESSED\n\nID: ${data.transaction_id}\nStatus: Success\nTotal: ${data.stats.total_processed}\nQuantum-Safe: ${data.stats.quantum_safe_upgrades}`, 'result-success');
+                    loadStats();
+                    loadAllTransactions();
+                } else {
+                    showResult(`Error: ${data.error}`, 'result-error');
+                }
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'result-error');
+            }
+        }
+
+        async function processCustomTransaction() {
+            if (!isConnected) {
+                showResult('Backend not connected.', 'result-error');
+                return;
+            }
+            const customTx = {
+                hash: '0x' + Math.random().toString(16).substr(2, 40),
+                from: '0x' + Math.random().toString(16).substr(2, 40),
+                to: '0x' + Math.random().toString(16).substr(2, 40),
+                value: String(Math.floor(Math.random() * 1000000000000000000)),
+                gasPrice: String(Math.floor(Math.random() * 100000000000)),
+                gasLimit: String(21000 + Math.floor(Math.random() * 100000)),
+                nonce: Math.floor(Math.random() * 1000),
+                data: '0x',
+                timestamp: Math.floor(Date.now() / 1000)
+            };
+            showResult('Processing custom transaction...', 'result-loading');
+            try {
+                const response = await fetch(`${API_BASE}/process-transaction`, { method: 'POST', headers: { 'Content-Type': 'application/json', }, body: JSON.stringify({ transaction: customTx }) });
+                const data = await response.json();
+                if (data.success) {
+                    showResult(`CUSTOM TRANSACTION PROCESSED\n\nHash: ${customTx.hash}\nValue: ${(parseInt(customTx.value) / 1e18).toFixed(4)} ETH\nStatus: Complete`, 'result-success');
+                    loadStats();
+                    loadAllTransactions();
+                } else {
+                    showResult(`Error: ${data.error}`, 'result-error');
+                }
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'result-error');
+            }
+        }
+
+        async function startBlockchainMonitoring() {
+            if (!isConnected) {
+                showResult('Backend not connected.', 'result-error');
+                return;
+            }
+            showResult('Starting blockchain monitoring...', 'result-loading');
+            try {
+                const response = await fetch(`${API_BASE}/start-blockchain-monitoring`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    showResult('Blockchain monitoring started!', 'result-success');
+                    isBlockchainMonitoring = true;
+                } else {
+                    showResult(`Error: ${data.error}`, 'result-error');
+                }
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'result-error');
+            }
+        }
+
+        async function stopBlockchainMonitoring() {
+            if (!isConnected) {
+                showResult('Backend not connected.', 'result-error');
+                return;
+            }
+            try {
+                const response = await fetch(`${API_BASE}/stop-blockchain-monitoring`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    showResult('Blockchain monitoring stopped.', 'result-success');
+                    isBlockchainMonitoring = false;
+                } else {
+                    showResult(`Error: ${data.error}`, 'result-error');
+                }
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'result-error');
+            }
+        }
+
+        async function loadAllTransactions() {
+            if (!isConnected) return;
+            try {
+                const response = await fetch(`${API_BASE}/transactions`);
+                const data = await response.json();
+                if (data.success) {
+                    displayTransactions(data.transactions);
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+            }
+        }
+
+        function displayTransactions(transactions) {
+            const container = document.getElementById('transactionList');
+            if (transactions.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No transactions yet</div>';
+                return;
+            }
+            container.innerHTML = transactions.slice(0, 20).map(tx => {
+                const value = (parseInt(tx.original.value) / 1e18).toFixed(4);
+                const isAnomaly = tx.anomaly_analysis.is_anomaly;
+                const badgeClass = isAnomaly ? 'badge-risk' : 'badge-safe';
+                const statusText = isAnomaly ? 'RISK' : 'SAFE';
+                return `
+                    <div class="transaction-item" onclick="showTransactionDetails('${tx.original.id}')">
+                        <div class="tx-info">
+                            <div class="tx-hash">${tx.original.hash.substring(0, 16)}...</div>
+                            <div class="tx-value">${value} ETH</div>
+                            <div class="tx-time">${new Date(tx.processed_at * 1000).toLocaleString()}</div>
+                        </div>
+                        <div class="tx-badge ${badgeClass}">${statusText}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function showTransactionDetails(txId) {
+            if (!isConnected) return;
+            try {
+                const response = await fetch(`${API_BASE}/transactions/${txId}`);
+                const data = await response.json();
+                if (data.success) {
+                    const tx = data.transaction;
+                    const value = (parseInt(tx.original.value) / 1e18).toFixed(4);
+                    document.getElementById('transactionDetails').innerHTML = `
+<div class="result-panel success">Hash: ${tx.original.hash}
+Value: ${value} ETH  
+From: ${tx.original.from}
+To: ${tx.original.to}
+
+Quantum-Safe: ${tx.upgraded.quantum_safe ? 'YES' : 'NO'}
+Anomaly: ${tx.anomaly_analysis.is_anomaly ? 'DETECTED' : 'SAFE'}
+Risk: ${tx.anomaly_analysis.risk_level}
+
+Processed: ${new Date(tx.processed_at * 1000).toLocaleString()}</div>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function startAutoProcessing() {
+            if (!isConnected) {
+                showResult('Backend not connected.', 'result-error');
+                return;
+            }
+            autoProcessingInterval = setInterval(() => {
+                simulateRealTransaction();
+            }, 8000);
+            showResult('Auto processing started! Processing every 8 seconds...', 'result-success');
+        }
+
+        function stopAutoProcessing() {
+            if (autoProcessingInterval) {
+                clearInterval(autoProcessingInterval);
+                autoProcessingInterval = null;
+                showResult('Auto processing stopped.', 'result-success');
+            }
+        }
+
+        async function resetSystem() {
+            if (!isConnected) {
+                showResult('Backend not connected.', 'result-error');
+                return;
+            }
+            try {
+                const response = await fetch(`${API_BASE}/reset`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    showResult('System reset. All data cleared.', 'result-success');
+                    loadStats();
+                    loadAllTransactions();
+                } else {
+                    showResult(`Error: ${data.error}`, 'result-error');
+                }
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'result-error');
+            }
+        }
+
+        // Initialize
+        setInterval(() => {
+            checkConnection();
+            loadStats();
+        }, 3000);
+
+        checkConnection();
+        loadStats();
+    </script>
+</body>
+
+</html>
